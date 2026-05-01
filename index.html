@@ -9,256 +9,249 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:Arial,sans-serif;background:#0b1020;color:white}
-.header{height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;background:linear-gradient(90deg,#111827,#020617);border-bottom:1px solid rgba(255,255,255,.08)}
-.menu span{margin-right:30px;font-size:18px;cursor:pointer}
-.menu span.active{color:#facc15}
-.logo{color:#3b82f6;font-weight:bold;font-size:22px;letter-spacing:2px}
-.topbar{display:flex;gap:12px;padding:16px 28px;background:rgba(255,255,255,.04)}
-.topbar input{flex:1;padding:14px;border-radius:10px;border:none;font-size:15px}
-.topbar button{padding:0 22px;border:none;border-radius:10px;background:#2563eb;color:white;font-weight:bold;cursor:pointer}
-.app{display:grid;grid-template-columns:260px 1fr 420px;height:calc(100vh - 118px)}
-.categories{background:rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.1);overflow:auto}
-.category{padding:15px 22px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer;font-weight:bold}
-.category:hover,.category.active{background:rgba(59,130,246,.25);color:#facc15}
-.center{background:linear-gradient(180deg,#111827,#0f172a);overflow:auto;padding:18px}
-.search{width:100%;padding:14px;border-radius:10px;border:none;margin-bottom:15px}
-.channel{display:flex;align-items:center;gap:14px;padding:12px;border-bottom:1px solid rgba(255,255,255,.08);cursor:pointer;border-radius:8px}
-.channel:hover{background:rgba(59,130,246,.25)}
-.channel img{width:42px;height:42px;border-radius:10px;object-fit:contain;background:#020617;padding:4px}
-.channel span{font-weight:bold}
-.playerPanel{background:linear-gradient(180deg,#111827,#020617);border-left:1px solid rgba(255,255,255,.1)}
-video{width:100%;height:260px;background:black}
-.info{padding:22px}
-.info h2{margin:0 0 10px;font-size:28px}
-.live{color:#22c55e;font-weight:bold}
-.buttons{display:flex;gap:10px;margin-top:20px}
-.buttons button{flex:1;padding:13px;border:none;border-radius:10px;background:#334155;color:white;font-weight:bold}
-@media(max-width:900px){
-  .app{grid-template-columns:150px 1fr}
-  .playerPanel{grid-column:2}
-  .menu span{margin-right:14px;font-size:15px}
+body{margin:0;font-family:Arial;background:#0b1020;color:white}
+
+/* HEADER */
+.header{
+  height:60px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:0 20px;
+  background:#020617;
 }
+.logo{color:#3b82f6;font-weight:bold;font-size:20px}
+
+/* TOPBAR */
+.topbar{
+  display:flex;
+  gap:10px;
+  padding:10px;
+}
+.topbar input{
+  flex:1;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+}
+.topbar button{
+  padding:10px;
+  border:none;
+  border-radius:8px;
+  background:#2563eb;
+  color:white;
+}
+
+/* LAYOUT */
+.app{
+  display:grid;
+  grid-template-columns:200px 1fr 350px;
+  height:calc(100vh - 110px);
+}
+
+/* CATEGORY */
+.categories{
+  background:#020617;
+  overflow:auto;
+}
+.category{
+  padding:10px;
+  cursor:pointer;
+}
+.category:hover{background:#1e293b}
+
+/* CHANNEL LIST */
+.center{
+  padding:10px;
+  overflow:auto;
+}
+.search{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+}
+.channel{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px;
+  border-bottom:1px solid #111;
+  cursor:pointer;
+}
+.channel:hover{background:#1e293b}
+
+/* LOGO */
+.channel img{
+  width:40px;
+  height:40px;
+  border-radius:8px;
+}
+
+/* OZYY LOGO */
+.ozyyLogo{
+  width:40px;
+  height:40px;
+  border-radius:8px;
+  background:#020617;
+  color:#3b82f6;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  font-weight:bold;
+}
+
+/* PLAYER */
+.playerPanel{
+  background:#020617;
+}
+video{
+  width:100%;
+  height:220px;
+  background:black;
+}
+.info{padding:10px}
 </style>
 </head>
 
 <body>
 
 <div class="header">
-  <div class="menu">
-    <span>Home</span>
-    <span class="active">Canlı yayın</span>
-    <span>Filmler</span>
-    <span>Diziler</span>
-  </div>
-  <div class="logo">OZYY</div>
+  <div class="logo">OZYY TV</div>
 </div>
 
 <div class="topbar">
   <input id="m3uUrl" value="https://iptv-org.github.io/iptv/countries/tr.m3u">
-  <button onclick="loadM3U()">M3U Yükle</button>
+  <button onclick="loadM3U()">Yükle</button>
 </div>
 
 <div class="app">
-  <div class="categories" id="categories"></div>
 
-  <div class="center">
-    <input class="search" id="searchBox" placeholder="Kanal ara..." oninput="renderChannels()">
-    <div id="channelList"></div>
-  </div>
+<div class="categories" id="categories"></div>
 
-  <div class="playerPanel">
-    <video id="video" controls></video>
-    <div class="info">
-      <h2 id="channelTitle">Kanal seç</h2>
-      <p><span class="live">LIVE</span> <span id="status">Hazır</span></p>
-      <p id="groupInfo"></p>
-      <div class="buttons">
-        <button onclick="addFavorite()">⭐ Favori</button>
-        <button onclick="showFavorites()">Favoriler</button>
-        <button onclick="showRecent()">Son izlenen</button>
-      </div>
-    </div>
+<div class="center">
+  <input class="search" id="searchBox" placeholder="Ara..." oninput="renderChannels()">
+  <div id="channelList"></div>
+</div>
+
+<div class="playerPanel">
+  <video id="video" controls></video>
+  <div class="info">
+    <h3 id="title">Kanal seç</h3>
   </div>
 </div>
 
+</div>
+
 <script>
-let channels = [];
-let currentCategory = "All";
-let currentChannel = null;
-let hls = null;
+let channels=[];
+let currentCategory="All";
+let currentChannel=null;
+let hls=null;
 
-const placeholderLogo = "https://dummyimage.com/100x100/0f172a/3b82f6&text=OZYY";
-
+/* M3U LOAD */
 async function loadM3U(){
-  const url = document.getElementById("m3uUrl").value.trim();
-  if(!url){ alert("M3U link yaz"); return; }
-
-  document.getElementById("status").innerText = "M3U yükleniyor...";
-
-  try{
-    const res = await fetch(url);
-    const text = await res.text();
-    parseM3U(text);
-    renderCategories();
-    renderChannels();
-    document.getElementById("status").innerText = "Kanallar yüklendi";
-  }catch(e){
-    alert("M3U yüklenemedi. Link CORS engelli olabilir.");
-    document.getElementById("status").innerText = "Hata";
-  }
-}
-
-function parseM3U(text){
-  channels = [];
-  const lines = text.split("\n");
-
-  for(let i=0;i<lines.length;i++){
-    const line = lines[i].trim();
-
-    if(line.startsWith("#EXTINF")){
-      const name = line.split(",").pop().trim();
-
-      const logoMatch = line.match(/tvg-logo="(.*?)"/);
-      const groupMatch = line.match(/group-title="(.*?)"/);
-
-      const logo = logoMatch ? logoMatch[1] : "";
-      const group = groupMatch ? groupMatch[1] : "Undefined";
-
-      const streamUrl = lines[i+1] ? lines[i+1].trim() : "";
-
-      if(streamUrl && !streamUrl.startsWith("#")){
-        channels.push({name,url:streamUrl,logo,group});
-      }
-    }
-  }
-}
-
-function renderCategories(){
-  const cats = ["All","⭐ Favoriler","🕘 Son izlenen"];
-  channels.forEach(c=>{
-    if(!cats.includes(c.group)) cats.push(c.group);
-  });
-
-  const box = document.getElementById("categories");
-  box.innerHTML = "";
-
-  cats.forEach(cat=>{
-    const div = document.createElement("div");
-    div.className = "category" + (cat === currentCategory ? " active" : "");
-    div.innerText = cat;
-
-    if(cat === "⭐ Favoriler") div.onclick = showFavorites;
-    else if(cat === "🕘 Son izlenen") div.onclick = showRecent;
-    else div.onclick = ()=>filterCategory(cat);
-
-    box.appendChild(div);
-  });
-}
-
-function filterCategory(cat){
-  currentCategory = cat;
+  let url=document.getElementById("m3uUrl").value;
+  let res=await fetch(url);
+  let text=await res.text();
+  parseM3U(text);
   renderCategories();
   renderChannels();
 }
 
-function renderChannels(customList){
-  const list = document.getElementById("channelList");
-  list.innerHTML = "";
+/* PARSE */
+function parseM3U(text){
+  channels=[];
+  let lines=text.split("\n");
 
-  const search = document.getElementById("searchBox").value.toLowerCase();
+  for(let i=0;i<lines.length;i++){
+    let line=lines[i];
 
-  let data = customList || channels.filter(c=>{
-    const byCat = currentCategory === "All" || c.group === currentCategory;
-    const bySearch = c.name.toLowerCase().includes(search);
-    return byCat && bySearch;
-  });
+    if(line.startsWith("#EXTINF")){
+      let name=line.split(",").pop();
 
-  data.forEach(ch=>list.appendChild(createChannel(ch)));
+      let logo=line.match(/tvg-logo="(.*?)"/)?.[1] || "";
+      let group=line.match(/group-title="(.*?)"/)?.[1] || "Other";
+
+      let url=lines[i+1];
+
+      channels.push({name,logo,url,group});
+    }
+  }
 }
 
-function createChannel(ch){
-  const div = document.createElement("div");
-  div.className = "channel";
+/* CATEGORY */
+function renderCategories(){
+  let box=document.getElementById("categories");
+  box.innerHTML="";
 
-  div.innerHTML = `
-    <img src="${ch.logo || placeholderLogo}" onerror="this.src='${placeholderLogo}'">
+  let cats=["All"];
+  channels.forEach(c=>{
+    if(!cats.includes(c.group)) cats.push(c.group);
+  });
+
+  cats.forEach(cat=>{
+    let div=document.createElement("div");
+    div.className="category";
+    div.innerText=cat;
+    div.onclick=()=>{currentCategory=cat;renderChannels()};
+    box.appendChild(div);
+  });
+}
+
+/* CHANNEL LIST */
+function renderChannels(){
+  let list=document.getElementById("channelList");
+  list.innerHTML="";
+
+  let search=document.getElementById("searchBox").value.toLowerCase();
+
+  channels.filter(c=>{
+    return (currentCategory=="All"||c.group==currentCategory) &&
+           c.name.toLowerCase().includes(search);
+  }).forEach(ch=>{
+    list.appendChild(createChannel(ch));
+  });
+}
+
+/* CHANNEL UI */
+function createChannel(ch){
+  let div=document.createElement("div");
+  div.className="channel";
+
+  let logoHtml=ch.logo
+    ? `<img src="${ch.logo}" onerror="this.outerHTML='<div class=\\'ozyyLogo\\'>OZYY</div>'">`
+    : `<div class="ozyyLogo">OZYY</div>`;
+
+  div.innerHTML=`
+    ${logoHtml}
     <span>${ch.name}</span>
   `;
 
-  div.onclick = ()=>playChannel(ch);
+  div.onclick=()=>playChannel(ch);
+
   return div;
 }
 
+/* PLAY */
 function playChannel(ch){
-  currentChannel = ch;
-
-  document.getElementById("channelTitle").innerText = ch.name;
-  document.getElementById("groupInfo").innerText = ch.group;
-  document.getElementById("status").innerText = "Oynatılıyor";
-
-  saveRecent(ch);
+  currentChannel=ch;
+  document.getElementById("title").innerText=ch.name;
   play(ch.url);
 }
 
 function play(url){
-  const video = document.getElementById("video");
+  let video=document.getElementById("video");
 
-  if(hls){
-    hls.destroy();
-    hls = null;
-  }
+  if(hls){hls.destroy()}
 
   if(Hls.isSupported()){
-    hls = new Hls();
+    hls=new Hls();
     hls.loadSource(url);
     hls.attachMedia(video);
-    hls.on(Hls.Events.MANIFEST_PARSED, function(){
-      video.play().catch(()=>{});
-    });
   }else{
-    video.src = url;
-    video.play().catch(()=>{});
+    video.src=url;
   }
-}
-
-function addFavorite(){
-  if(!currentChannel){
-    alert("Önce kanal seç");
-    return;
-  }
-
-  let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-
-  if(!favs.find(x=>x.url === currentChannel.url)){
-    favs.push(currentChannel);
-    localStorage.setItem("favorites", JSON.stringify(favs));
-    alert("Favorilere eklendi");
-  }else{
-    alert("Zaten favorilerde");
-  }
-}
-
-function showFavorites(){
-  currentCategory = "⭐ Favoriler";
-  renderCategories();
-  const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
-  renderChannels(favs);
-}
-
-function saveRecent(ch){
-  let rec = JSON.parse(localStorage.getItem("recent") || "[]");
-  rec = rec.filter(x=>x.url !== ch.url);
-  rec.unshift(ch);
-  rec = rec.slice(0,20);
-  localStorage.setItem("recent", JSON.stringify(rec));
-}
-
-function showRecent(){
-  currentCategory = "🕘 Son izlenen";
-  renderCategories();
-  const rec = JSON.parse(localStorage.getItem("recent") || "[]");
-  renderChannels(rec);
 }
 
 loadM3U();
