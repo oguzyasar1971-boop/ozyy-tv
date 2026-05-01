@@ -12,78 +12,75 @@
 body{
   margin:0;
   font-family:Arial, sans-serif;
-  background:#080b14;
+  background:#0b1020;
   color:white;
 }
 .header{
-  height:64px;
+  height:60px;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:0 28px;
-  background:linear-gradient(90deg,#111827,#1f2937);
-}
-.menu{
-  display:flex;
-  gap:32px;
-  font-size:20px;
+  background:linear-gradient(90deg,#111827,#020617);
+  border-bottom:1px solid rgba(255,255,255,.08);
 }
 .menu span{
+  margin-right:30px;
+  font-size:18px;
   cursor:pointer;
-  opacity:.85;
 }
 .menu span.active{
   color:#facc15;
 }
 .logo{
   color:#3b82f6;
-  font-size:24px;
   font-weight:bold;
+  font-size:22px;
   letter-spacing:2px;
 }
-.topInput{
+.topbar{
   display:flex;
   gap:12px;
-  padding:18px 28px;
-  background:#111827;
+  padding:16px 28px;
+  background:rgba(255,255,255,.04);
 }
-#m3uUrl{
+.topbar input{
   flex:1;
   padding:14px;
-  border:none;
   border-radius:10px;
-  font-size:16px;
+  border:none;
+  font-size:15px;
 }
-button{
+.topbar button{
+  padding:0 22px;
   border:none;
   border-radius:10px;
   background:#2563eb;
   color:white;
-  padding:12px 22px;
   font-weight:bold;
   cursor:pointer;
 }
-.main{
+.app{
   display:grid;
-  grid-template-columns:260px 1fr 430px;
+  grid-template-columns:260px 1fr 420px;
   height:calc(100vh - 118px);
 }
 .categories{
-  background:rgba(15,23,42,.95);
-  border-right:1px solid #334155;
+  background:rgba(255,255,255,.04);
+  border-right:1px solid rgba(255,255,255,.1);
   overflow:auto;
 }
 .category{
-  padding:16px 22px;
-  border-bottom:1px solid #1e293b;
+  padding:15px 22px;
+  border-bottom:1px solid rgba(255,255,255,.08);
   cursor:pointer;
   font-weight:bold;
 }
 .category:hover,.category.active{
-  background:#1e293b;
+  background:rgba(59,130,246,.25);
   color:#facc15;
 }
-.channels{
+.center{
   background:linear-gradient(180deg,#111827,#0f172a);
   overflow:auto;
   padding:18px;
@@ -91,23 +88,21 @@ button{
 .search{
   width:100%;
   padding:14px;
-  border:none;
   border-radius:10px;
-  margin-bottom:14px;
-  font-size:16px;
+  border:none;
+  margin-bottom:15px;
 }
 .channel{
   display:flex;
   align-items:center;
   gap:14px;
   padding:12px;
-  border-bottom:1px solid #334155;
+  border-bottom:1px solid rgba(255,255,255,.08);
   cursor:pointer;
   border-radius:8px;
 }
 .channel:hover{
-  background:#1e293b;
-  transform:scale(1.01);
+  background:rgba(59,130,246,.25);
 }
 .channel img{
   width:42px;
@@ -116,58 +111,53 @@ button{
   object-fit:contain;
   background:#1e293b;
 }
-.channelName{
-  font-size:17px;
+.channel span{
   font-weight:bold;
 }
 .playerPanel{
   background:linear-gradient(180deg,#111827,#020617);
-  border-left:1px solid #334155;
-  padding:18px;
+  border-left:1px solid rgba(255,255,255,.1);
 }
 video{
   width:100%;
   height:260px;
   background:black;
-  border-radius:12px;
 }
-.nowTitle{
+.info{
+  padding:22px;
+}
+.info h2{
+  margin:0 0 10px;
   font-size:28px;
-  font-weight:bold;
-  margin-top:18px;
 }
 .live{
   color:#22c55e;
   font-weight:bold;
-  margin-top:8px;
 }
-.meta{
-  color:#cbd5e1;
-  margin-top:8px;
-}
-.actions{
+.buttons{
   display:flex;
   gap:10px;
-  margin-top:22px;
+  margin-top:20px;
 }
-.actions button{
+.buttons button{
   flex:1;
-  background:#312e81;
-}
-.status{
-  margin-top:12px;
-  color:#94a3b8;
+  padding:13px;
+  border:none;
+  border-radius:10px;
+  background:#334155;
+  color:white;
+  font-weight:bold;
 }
 @media(max-width:900px){
-  .main{
+  .app{
     grid-template-columns:150px 1fr;
   }
   .playerPanel{
-    grid-column:1/3;
-    height:auto;
+    grid-column:2;
   }
-  video{
-    height:220px;
+  .menu span{
+    margin-right:14px;
+    font-size:15px;
   }
 }
 </style>
@@ -185,110 +175,87 @@ video{
   <div class="logo">OZYY</div>
 </div>
 
-<div class="topInput">
+<div class="topbar">
   <input id="m3uUrl" value="https://iptv-org.github.io/iptv/countries/tr.m3u">
   <button onclick="loadM3U()">M3U Yükle</button>
 </div>
 
-<div class="main">
+<div class="app">
 
   <div class="categories" id="categories">
-    <div class="category active" onclick="selectCategory('All')">All</div>
+    <div class="category active" onclick="filterCategory('All')">All</div>
     <div class="category" onclick="showFavorites()">⭐ Favoriler</div>
     <div class="category" onclick="showRecent()">🕘 Son izlenen</div>
   </div>
 
-  <div class="channels">
-    <input class="search" id="search" placeholder="Kanal ara..." oninput="renderChannels()">
+  <div class="center">
+    <input class="search" id="searchBox" placeholder="Kanal ara..." oninput="renderChannels()">
     <div id="channelList"></div>
   </div>
 
   <div class="playerPanel">
-    <video id="video" controls autoplay></video>
-
-    <div class="nowTitle" id="nowTitle">Ozyy TV Player</div>
-    <div class="live" id="liveText">LIVE Kanal seç → otomatik oynar</div>
-    <div class="meta" id="metaText">M3U link yükle ve kanal seç</div>
-
-    <div class="actions">
-      <button onclick="addFavorite()">⭐ Favori</button>
-      <button onclick="showFavorites()">Favoriler</button>
-      <button onclick="showRecent()">Son izlenen</button>
+    <video id="video" controls></video>
+    <div class="info">
+      <h2 id="channelTitle">Kanal seç</h2>
+      <p><span class="live">LIVE</span> <span id="status">Hazır</span></p>
+      <p id="groupInfo"></p>
+      <div class="buttons">
+        <button onclick="addFavorite()">⭐ Favori</button>
+        <button onclick="showFavorites()">Favoriler</button>
+        <button onclick="showRecent()">Son izlenen</button>
+      </div>
     </div>
-
-    <div class="status" id="status">Hazır</div>
   </div>
 
 </div>
 
 <script>
-let allChannels = [];
-let filteredChannels = [];
+let channels = [];
 let currentCategory = "All";
 let currentChannel = null;
 let hls = null;
 
-let favorites = JSON.parse(localStorage.getItem("ozyy_favorites") || "[]");
-let recent = JSON.parse(localStorage.getItem("ozyy_recent") || "[]");
-
-function saveData(){
-  localStorage.setItem("ozyy_favorites", JSON.stringify(favorites));
-  localStorage.setItem("ozyy_recent", JSON.stringify(recent));
-}
-
-function placeholderLogo(){
-  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-  <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80">
-    <rect width="100%" height="100%" fill="#2563eb"/>
-    <text x="50%" y="55%" font-size="28" fill="white" text-anchor="middle" font-family="Arial">TV</text>
-  </svg>`);
-}
+const placeholderLogo = "https://upload.wikimedia.org/wikipedia/commons/6/65/No-Image-Placeholder.svg";
 
 async function loadM3U(){
   const url = document.getElementById("m3uUrl").value.trim();
+  if(!url){ alert("M3U link yaz"); return; }
+
   document.getElementById("status").innerText = "M3U yükleniyor...";
 
   try{
     const res = await fetch(url);
     const text = await res.text();
     parseM3U(text);
-    buildCategories();
-    selectCategory("All");
-    document.getElementById("status").innerText = allChannels.length + " kanal yüklendi";
+    renderCategories();
+    renderChannels();
+    document.getElementById("status").innerText = "Kanallar yüklendi";
   }catch(e){
-    document.getElementById("status").innerText = "M3U yüklenemedi. Link CORS desteklemiyor olabilir.";
-    alert("M3U yüklenemedi. Başka link dene.");
+    alert("M3U yüklenemedi. Link CORS engelli olabilir.");
+    document.getElementById("status").innerText = "Hata";
   }
 }
 
 function parseM3U(text){
-  allChannels = [];
+  channels = [];
   const lines = text.split("\n");
 
-  for(let i=0; i<lines.length; i++){
-    let line = lines[i].trim();
+  for(let i=0;i<lines.length;i++){
+    const line = lines[i].trim();
 
     if(line.startsWith("#EXTINF")){
-      let name = line.split(",").pop().trim();
+      const name = line.split(",").pop().trim();
 
-      let logoMatch = line.match(/tvg-logo="(.*?)"/);
-      let groupMatch = line.match(/group-title="(.*?)"/);
+      const logoMatch = line.match(/tvg-logo="(.*?)"/);
+      const groupMatch = line.match(/group-title="(.*?)"/);
 
-      let logo = logoMatch ? logoMatch[1] : placeholderLogo();
-      let group = groupMatch ? groupMatch[1] : "Undefined";
+      const logo = logoMatch ? logoMatch[1] : "";
+      const group = groupMatch ? groupMatch[1] : "Undefined";
 
-      let streamUrl = "";
+      const streamUrl = lines[i+1] ? lines[i+1].trim() : "";
 
-      for(let j=i+1; j<lines.length; j++){
-        let next = lines[j].trim();
-        if(next && !next.startsWith("#")){
-          streamUrl = next;
-          break;
-        }
-      }
-
-      if(streamUrl){
-        allChannels.push({
+      if(streamUrl && !streamUrl.startsWith("#")){
+        channels.push({
           name:name,
           url:streamUrl,
           logo:logo,
@@ -299,63 +266,76 @@ function parseM3U(text){
   }
 }
 
-function buildCategories(){
+function renderCategories(){
+  const cats = ["All","⭐ Favoriler","🕘 Son izlenen"];
+  channels.forEach(c=>{
+    if(!cats.includes(c.group)) cats.push(c.group);
+  });
+
   const box = document.getElementById("categories");
-  box.innerHTML = `
-    <div class="category active" onclick="selectCategory('All')">All</div>
-    <div class="category" onclick="showFavorites()">⭐ Favoriler</div>
-    <div class="category" onclick="showRecent()">🕘 Son izlenen</div>
-  `;
+  box.innerHTML = "";
 
-  const groups = [...new Set(allChannels.map(c => c.group))];
-
-  groups.forEach(g=>{
+  cats.forEach(cat=>{
     const div = document.createElement("div");
-    div.className = "category";
-    div.innerText = g;
-    div.onclick = () => selectCategory(g);
+    div.className = "category" + (cat === currentCategory ? " active" : "");
+    div.innerText = cat;
+
+    if(cat === "⭐ Favoriler"){
+      div.onclick = showFavorites;
+    }else if(cat === "🕘 Son izlenen"){
+      div.onclick = showRecent;
+    }else{
+      div.onclick = ()=>filterCategory(cat);
+    }
+
     box.appendChild(div);
   });
 }
 
-function selectCategory(cat){
+function filterCategory(cat){
   currentCategory = cat;
-  filteredChannels = cat === "All" ? allChannels : allChannels.filter(c => c.group === cat);
+  renderCategories();
   renderChannels();
 }
 
-function renderChannels(){
+function renderChannels(customList){
   const list = document.getElementById("channelList");
-  const search = document.getElementById("search").value.toLowerCase();
-
   list.innerHTML = "";
 
-  filteredChannels
-    .filter(c => c.name.toLowerCase().includes(search))
-    .forEach(ch=>{
-      const div = document.createElement("div");
-      div.className = "channel";
-      div.innerHTML = `
-        <img src="${ch.logo || placeholderLogo()}" onerror="this.src='${placeholderLogo()}'">
-        <div class="channelName">${ch.name}</div>
-      `;
-      div.onclick = () => playChannel(ch);
-      list.appendChild(div);
-    });
+  const search = document.getElementById("searchBox").value.toLowerCase();
+
+  let data = customList || channels.filter(c=>{
+    const byCat = currentCategory === "All" || c.group === currentCategory;
+    const bySearch = c.name.toLowerCase().includes(search);
+    return byCat && bySearch;
+  });
+
+  data.forEach(ch=>{
+    list.appendChild(createChannel(ch));
+  });
+}
+
+function createChannel(ch){
+  const div = document.createElement("div");
+  div.className = "channel";
+
+  div.innerHTML = `
+    <img src="${ch.logo || placeholderLogo}" onerror="this.src='${placeholderLogo}'">
+    <span>${ch.name}</span>
+  `;
+
+  div.onclick = ()=>playChannel(ch);
+  return div;
 }
 
 function playChannel(ch){
   currentChannel = ch;
-  document.getElementById("nowTitle").innerText = ch.name;
-  document.getElementById("liveText").innerText = "LIVE Oynatılıyor";
-  document.getElementById("metaText").innerText = ch.group;
+
+  document.getElementById("channelTitle").innerText = ch.name;
+  document.getElementById("groupInfo").innerText = ch.group;
   document.getElementById("status").innerText = "Oynatılıyor";
 
-  recent = recent.filter(x => x.url !== ch.url);
-  recent.unshift(ch);
-  recent = recent.slice(0,20);
-  saveData();
-
+  saveRecent(ch);
   play(ch.url);
 }
 
@@ -386,9 +366,10 @@ function addFavorite(){
     return;
   }
 
-  if(!favorites.find(x => x.url === currentChannel.url)){
-    favorites.push(currentChannel);
-    saveData();
+  let favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+  if(!favs.find(x=>x.url === currentChannel.url)){
+    favs.push(currentChannel);
+    localStorage.setItem("favorites", JSON.stringify(favs));
     alert("Favorilere eklendi");
   }else{
     alert("Zaten favorilerde");
@@ -396,16 +377,28 @@ function addFavorite(){
 }
 
 function showFavorites(){
-  filteredChannels = favorites;
-  renderChannels();
+  currentCategory = "⭐ Favoriler";
+  renderCategories();
+  const favs = JSON.parse(localStorage.getItem("favorites") || "[]");
+  renderChannels(favs);
+}
+
+function saveRecent(ch){
+  let rec = JSON.parse(localStorage.getItem("recent") || "[]");
+  rec = rec.filter(x=>x.url !== ch.url);
+  rec.unshift(ch);
+  rec = rec.slice(0,20);
+  localStorage.setItem("recent", JSON.stringify(rec));
 }
 
 function showRecent(){
-  filteredChannels = recent;
-  renderChannels();
+  currentCategory = "🕘 Son izlenen";
+  renderCategories();
+  const rec = JSON.parse(localStorage.getItem("recent") || "[]");
+  renderChannels(rec);
 }
 
-window.onload = loadM3U;
+loadM3U();
 </script>
 
 </body>
