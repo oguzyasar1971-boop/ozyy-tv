@@ -103,8 +103,12 @@ function play(url) {
     let hls = new Hls();
     hls.loadSource(url);
     hls.attachMedia(video);
+    video.muted = true;
+    video.play();
   } else {
     video.src = url;
+    video.muted = true;
+    video.play();
   }
 }
 </script>
