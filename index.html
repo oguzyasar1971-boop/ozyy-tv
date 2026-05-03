@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ozyy TV Player</title>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial;background:#070914;color:white}
+.topbar{height:60px;background:#11131f;display:flex;align-items:center;gap:28px;padding:0 24px}
+.topbar span{font-size:18px;cursor:pointer}
+.active{color:#ffd34d}
+.logo{margin-left:auto;color:#3b82f6;font-weight:bold;font-size:22px}
+.loadbar{display:flex;gap:10px;padding:12px;background:#20222c}
+.loadbar input{flex:1;padding:12px;border-radius:8px;border:0}
+.loadbar button{padding:12px 20px;border:0;border-radius:8px;background:#2563eb;color:white;font-weight:bold}
+.main{display:grid;grid-template-columns:22% 36% 42%;height:calc(100vh - 120px)}
+.categories,.channels,.playerbox{overflow:auto;border-right:1px solid #333;background:rgba(255,255,255,.04)}
+.cat,.channel{padding:14px;border-bottom:1px solid rgba(255,255,255,.12);cursor:pointer}
+.cat:hover,.channel:hover{background:#1e293b}
+.cat strong{color:#ffd34d}
+.search{padding:12px}
+.search input{width:100%;padding:12px;border-radius:8px;border:0}
+.channel{display:flex;align-items:center;gap:12px}
+.channel img{width:38px;height:38px;border-radius:7px;background:#222;object-fit:contain}
+video{width:100%;height:45vh;background:#000}
+.info{padding:18px}
+.info h1{font-size:26px;margin:10px 0}
+.live{color:#22c55e;font-weight:bold}
+.buttons{display:flex;gap:10px;margin-top:18px}
+.buttons button{flex:1;padding:13px;border:0;border-radius:10px;background:#3b335f;color:white;font-weight:bold}
+.small{font-size:13px;color:#aaa}
+</style>
+</head>
+
+<body>
+
+<div class="topbar">
+  <span>Home</span>
+  <span class="active">Canlı yayın</span>
+  <span>Filmler</span>
+  <span>Diziler</span>
+  <div class="logo">OZYY</div>
+</div>
+
+<div class="loadbar">
+  <input id="m3uUrl" value="https://iptv-org.github.io/iptv/countries/tr.m3u">
+  <button onclick="loadM3U()">M3U Yükle</button>
+</div>
+
+<div class="main">
+  <div class="categories" id="categories"></div>
+
+  <div class="channels">
+    <div class="search">
+      <input id="search" placeholder="Kanal ara..." oninput="renderChannels()">
+    </div>
+    <div id="channelList"></div>
+  </div>
+
+  <div class="playerbox">
+    <video id="video" controls autoplay></video>
+    <div class="info">
+      <h1 id="channelTitle">Kanal seç</h1>
+      <div><span class="live">LIVE</span> <span id="status">Hazır</span></div>
+      <p class="small" id="groupText">Kategori bekleniyor</p>
+
+      <div class="buttons">
+        <button onclick="addFavorite()">⭐ Favori</button>
+        <button onclick="showFavorites()">Favoriler</button>
+        <button onclick="showRecent()">Son izlenen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let channels = [];
+let currentGroup = "All";
+let currentChannel = null;
+let hls = null;
+
+let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
+let recent = JSON.parse(localStorage.getItem("recent") || "[]");
+
+function parseM3U(text){
+  let lines = text.split("\n");
+  let list = [];
+
+  for(let i=0;i<lines.length;i++){
+    let line = lines[i].trim();
+
+    if(line.startsWith("#EXTINF")){
+      let name = line.split(",").pop().trim();
+      let logo = "";
+      let group = "Undefined";
+
+      let logoMatch = line.match(/tvg-logo="(.*?)"/);
+      let groupMatch = line.match(/group-title="(.*?)"/);
+
+      if(logoMatch) logo = logoMatch[1];
+      if(groupMatch) group = groupMatch[1];
+
+      let url = "";
+      for(let j=i+1;j<lines.length;j++){
+        if(lines[j].trim() && !lines[j].startsWith("#")){
+          url = lines[j].trim();
+          break;
+        }
+      }
+
+      if(url){
+        list.push({name, logo, group, url});
+      }
+    }
+  }
+  return list;
+}
+
+async function loadM3U(){
+  let url = document.getElementById("m3uUrl").value.trim();
+  document.getElementById("status").innerText = "Yükleniyor...";
+
+  try{
+    let res = await fetch(url);
+    let text = await res.text();
+    channels = parseM3U(text);
+    currentGroup = "All";
+    renderCategories();
+    renderChannels();
+    document.getElementById("status").innerText = channels.length + " kanal yüklendi";
+  }catch(e){
+    document.getElementById("status").innerText = "M3U yüklenemedi";
+    alert("M3U yüklenemedi. Link CORS engelli olabilir.");
+  }
+}
+
+function renderCategories(){
+  let box = document.getElementById("categories");
+  let groups = ["All","⭐ Favoriler","🕘 Son izlenen", ...new Set(channels.map(c=>c.group))];
+
+  box.innerHTML = "";
+  groups.forEach(g=>{
+    let div = document.createElement("div");
+    div.className = "cat";
+    div.innerHTML = g === currentGroup ? `<strong>${g}</strong>` : g;
+    div.onclick = ()=>{
+      currentGroup = g;
+      renderCategories();
+      renderChannels();
+    };
+    box.appendChild(div);
+  });
+}
+
+function renderChannels(){
+  let q = document.getElementById("search").value.toLowerCase();
+  let list = channels;
+
+  if(currentGroup === "⭐ Favoriler"){
+    list = favorites;
+  } else if(currentGroup === "🕘 Son izlenen"){
+    list = recent;
+  } else if(currentGroup !== "All"){
+    list = channels.filter(c=>c.group === currentGroup);
+  }
+
+  list = list.filter(c=>c.name.toLowerCase().includes(q));
+
+  let box = document.getElementById("channelList");
+  box.innerHTML = "";
+
+  list.forEach(ch=>{
+    let div = document.createElement("div");
+    div.className = "channel";
+    div.innerHTML = `
+      <img src="${ch.logo || ''}" onerror="this.src='https://via.placeholder.com/40/1e293b/ffffff?text=TV'">
+      <span>${ch.name}</span>
+    `;
+    div.onclick = ()=>playChannel(ch);
+    box.appendChild(div);
+  });
+}
+
+function playChannel(ch){
+  currentChannel = ch;
+  document.getElementById("channelTitle").innerText = ch.name;
+  document.getElementById("groupText").innerText = ch.group;
+  document.getElementById("status").innerText = "Oynatılıyor";
+
+  recent = recent.filter(x=>x.url !== ch.url);
+  recent.unshift(ch);
+  recent = recent.slice(0,20);
+  localStorage.setItem("recent", JSON.stringify(recent));
+
+  let video = document.getElementById("video");
+
+  if(hls){
+    hls.destroy();
+    hls = null;
+  }
+
+  if(Hls.isSupported()){
+    hls = new Hls();
+    hls.loadSource(ch.url);
+    hls.attachMedia(video);
+    video.play().catch(()=>{});
+  }else{
+    video.src = ch.url;
+    video.play().catch(()=>{});
+  }
+}
+
+function addFavorite(){
+  if(!currentChannel) return alert("Önce kanal seç");
+  if(!favorites.find(x=>x.url === currentChannel.url)){
+    favorites.push(currentChannel);
+    localStorage.setItem("favorites", JSON.stringify(favorites));
+    alert("Favorilere eklendi");
+  }
+}
+
+function showFavorites(){
+  currentGroup = "⭐ Favoriler";
+  renderCategories();
+  renderChannels();
+}
+
+function showRecent(){
+  currentGroup = "🕘 Son izlenen";
+  renderCategories();
+  renderChannels();
+}
+
+loadM3U();
+</script>
+
+</body>
+</html>
