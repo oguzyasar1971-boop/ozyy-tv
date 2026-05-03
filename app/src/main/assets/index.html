@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ozyy TV Player</title>
+
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+
+<body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen">
+
+  <div class="logo">
+    <div class="play-icon">▶</div>
+    <h1>Ozyy TV Player</h1>
+    <p>Premium IPTV Experience</p>
+  </div>
+
+  <div class="tabs">
+    <button onclick="showTab('xtream')">Xtream</button>
+    <button onclick="showTab('m3u')">M3U</button>
+    <button onclick="showTab('mac')">MAC</button>
+  </div>
+
+  <!-- XTREAM -->
+  <div id="xtream" class="login-box">
+    <h2>Xtream Codes Login</h2>
+    <input id="server" placeholder="Server URL">
+    <input id="username" placeholder="Username">
+    <input id="password" placeholder="Password" type="password">
+    <button onclick="loadXtream()">Giriş Yap</button>
+  </div>
+
+  <!-- M3U -->
+  <div id="m3u" class="login-box hidden">
+    <h2>M3U Playlist</h2>
+    <input id="m3uUrl" placeholder="M3U URL">
+    <button onclick="loadM3U()">Playlist Yükle</button>
+  </div>
+
+  <!-- MAC -->
+  <div id="mac" class="login-box hidden">
+    <h2>MAC Address Login</h2>
+    <input placeholder="MAC Address 1">
+    <input placeholder="MAC Address 2">
+    <input placeholder="Portal URL">
+    <button onclick="alert('MAC sistemi sonra eklenecek')">Devam Et</button>
+  </div>
+
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+
+  <div class="top-menu">
+    <button>LIVE TV</button>
+    <button>EPG</button>
+    <button>VOD</button>
+    <button>SERIES</button>
+    <button>FAVORITE</button>
+    <button>SETTINGS</button>
+  </div>
+
+  <video id="video" controls autoplay></video>
+
+  <div id="channels"></div>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
